@@ -8,64 +8,68 @@ public class SimpleCameraController : MonoBehaviour
 {
     [Header("Objetivo")]
     [SerializeField] private Transform target;
-    [SerializeField] private Vector3 offset = new Vector3(0, 1.5f, 0);
+    [SerializeField] private Vector3 targetOffset = new Vector3(0, 1.5f, 0);
 
-    [Header("Distancia y Posición")]
-    [SerializeField] private float distance = 5f;
+    [Header("Distancia")]
+    [SerializeField] private float distance = 4f;
     [SerializeField] private float minDistance = 2f;
-    [SerializeField] private float maxDistance = 10f;
+    [SerializeField] private float maxDistance = 8f;
+    [SerializeField] private float zoomSpeed = 1f;
 
     [Header("Sensibilidad")]
-    [SerializeField] private float mouseSensitivity = 100f;
-    [SerializeField] private float scrollSensitivity = 2f;
+    [SerializeField] private float mouseSensitivityX = 2f;
+    [SerializeField] private float mouseSensitivityY = 2f;
 
     [Header("Límites de Rotación")]
-    [SerializeField] private float minYAngle = -30f;
-    [SerializeField] private float maxYAngle = 70f;
+    [SerializeField] private float minVerticalAngle = -30f;
+    [SerializeField] private float maxVerticalAngle = 60f;
 
-    [Header("Suavizado")]
-    [SerializeField] private float positionSmoothing = 10f;
-    [SerializeField] private float rotationSmoothing = 5f;
+    [Header("Suavizado (Menos = Más Estable)")]
+    [SerializeField] private float positionSmoothSpeed = 12f; // Mayor = más directo
+    [SerializeField] private float rotationSmoothSpeed = 10f; // Mayor = más directo
 
     [Header("Colisión")]
-    [SerializeField] private bool useCollision = true;
-    [SerializeField] private float collisionRadius = 0.3f;
-    [SerializeField] private LayerMask collisionLayers = -1;
+    [SerializeField] private bool checkCollision = true;
+    [SerializeField] private float collisionRadius = 0.2f;
+    [SerializeField] private LayerMask collisionMask = -1;
+    [SerializeField] private float collisionSmoothSpeed = 15f; // Mayor = más rápido al acercarse
+
+    [Header("Estabilidad")]
+    [SerializeField] private bool lockCursorOnStart = true;
+    [SerializeField] private bool useFixedOffset = true; // Offset fijo sin variación
 
     // Variables privadas
     private float currentX = 0f;
     private float currentY = 20f;
     private float currentDistance;
-    private Vector3 currentPosition;
-    private Quaternion currentRotation;
+    private float targetDistance;
+    private Vector3 desiredPosition;
 
     void Start()
     {
-        // Buscar el objetivo si no está asignado
+        // Buscar objetivo
         if (target == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
                 target = player.transform;
-            else
-                Debug.LogError("No se encontró un GameObject con tag 'Player'. Asigna el objetivo manualmente.");
         }
 
-        // Inicializar distancia
+        // Inicializar
         currentDistance = distance;
+        targetDistance = distance;
 
-        // Inicializar rotación desde la cámara actual
+        // Inicializar rotación desde la posición actual
         Vector3 angles = transform.eulerAngles;
         currentX = angles.y;
         currentY = angles.x;
 
-        // Bloquear cursor
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        // Inicializar posición y rotación
-        currentPosition = transform.position;
-        currentRotation = transform.rotation;
+        // Cursor
+        if (lockCursorOnStart)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     void LateUpdate()
@@ -73,111 +77,120 @@ public class SimpleCameraController : MonoBehaviour
         if (target == null) return;
 
         HandleInput();
-        CalculateCameraPosition();
-        ApplyCameraTransform();
+        UpdateCameraPosition();
     }
 
     void HandleInput()
     {
-        // Input del mouse
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        // Rotación con mouse (sin suavizado en el input)
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivityX;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivityY;
 
         currentX += mouseX;
         currentY -= mouseY;
-        currentY = Mathf.Clamp(currentY, minYAngle, maxYAngle);
+        currentY = Mathf.Clamp(currentY, minVerticalAngle, maxVerticalAngle);
 
-        // Zoom con la rueda del mouse
-        float scroll = Input.GetAxis("Mouse ScrollWheel") * scrollSensitivity;
-        distance -= scroll;
-        distance = Mathf.Clamp(distance, minDistance, maxDistance);
+        // Zoom con rueda del mouse
+        float scroll = Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
+        targetDistance -= scroll;
+        targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
 
-        // Suavizar el zoom
-        currentDistance = Mathf.Lerp(currentDistance, distance, Time.deltaTime * 5f);
-
-        // Desbloquear cursor con ESC
+        // Control de cursor
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 
-        // Bloquear cursor al hacer clic
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && Cursor.lockState == CursorLockMode.None)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
     }
 
-    void CalculateCameraPosition()
+    void UpdateCameraPosition()
     {
-        // Punto objetivo (posición del personaje + offset)
-        Vector3 targetPosition = target.position + offset;
+        // Punto objetivo (centro de enfoque)
+        Vector3 targetPosition = target.position + targetOffset;
 
-        // Calcular rotación deseada
-        Quaternion desiredRotation = Quaternion.Euler(currentY, currentX, 0);
+        // Calcular rotación deseada (SIN suavizado en la rotación)
+        Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
 
-        // Calcular dirección de la cámara
-        Vector3 direction = desiredRotation * Vector3.back;
+        // Dirección desde el objetivo hacia la cámara
+        Vector3 direction = rotation * Vector3.back;
 
-        // Distancia final (puede cambiar por colisión)
+        // Suavizar zoom (solo el zoom, no la posición)
+        currentDistance = Mathf.Lerp(currentDistance, targetDistance, Time.deltaTime * 8f);
+
+        // Distancia final después de colisión
         float finalDistance = currentDistance;
 
-        // Detectar colisiones
-        if (useCollision)
+        // Detección de colisión
+        if (checkCollision)
         {
             RaycastHit hit;
-            if (Physics.SphereCast(targetPosition, collisionRadius, direction, out hit, currentDistance, collisionLayers))
+            if (Physics.SphereCast(targetPosition, collisionRadius, direction, out hit, currentDistance, collisionMask))
             {
                 finalDistance = Mathf.Max(hit.distance - collisionRadius, minDistance);
             }
         }
 
         // Calcular posición deseada
-        Vector3 desiredPosition = targetPosition + direction * finalDistance;
+        desiredPosition = targetPosition + direction * finalDistance;
 
-        // Suavizar rotación
-        currentRotation = Quaternion.Slerp(currentRotation, desiredRotation, rotationSmoothing * Time.deltaTime);
+        // Aplicar posición CON suavizado mínimo (más directo que antes)
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, positionSmoothSpeed * Time.deltaTime);
 
-        // Suavizar posición
-        currentPosition = Vector3.Lerp(currentPosition, desiredPosition, positionSmoothing * Time.deltaTime);
+        // Aplicar rotación (directa, sin Slerp para máxima estabilidad)
+        transform.rotation = rotation;
     }
 
-    void ApplyCameraTransform()
-    {
-        transform.position = currentPosition;
-        transform.rotation = currentRotation;
-    }
-
-    // Método público para establecer el objetivo
+    // Métodos públicos
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
     }
 
-    // Método público para resetear la cámara
-    public void ResetCamera()
+    public void SetDistance(float newDistance)
     {
-        currentX = 0f;
-        currentY = 20f;
-        distance = 5f;
-        currentDistance = distance;
+        distance = newDistance;
+        targetDistance = newDistance;
     }
 
-    // Visualización en el editor
-    void OnDrawGizmosSelected()
+    public void ResetCamera()
     {
         if (target == null) return;
+        currentX = 0f;
+        currentY = 20f;
+        currentDistance = distance;
+        targetDistance = distance;
+    }
 
-        // Dibujar línea hacia el objetivo
-        Gizmos.color = Color.yellow;
-        Vector3 targetPos = target.position + offset;
-        Gizmos.DrawLine(transform.position, targetPos);
-        Gizmos.DrawWireSphere(targetPos, 0.3f);
+    public float GetCurrentDistance()
+    {
+        return currentDistance;
+    }
 
-        // Dibujar radio de colisión
+    // Visualización
+    void OnDrawGizmosSelected()
+    {
+        if (target == null || !Application.isPlaying) return;
+
+        // Punto objetivo
+        Vector3 targetPos = target.position + targetOffset;
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, collisionRadius);
+        Gizmos.DrawWireSphere(targetPos, 0.2f);
+
+        // Línea hacia la cámara
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(targetPos, transform.position);
+
+        // Radio de colisión
+        if (checkCollision)
+        {
+            Gizmos.color = new Color(1, 0, 0, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, collisionRadius);
+        }
     }
 }

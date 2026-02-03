@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0ffacf56aa80b4fa68e2037a7fdbbc, type: 3}
   m_Name: Kebab
   m_EditorClassIdentifier: 
-  name: 
-  isStackable: 1
+  name: Kebab
+  canBeStacked: 1
   canBeDiscard: 0
