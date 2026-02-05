@@ -8,4 +8,5 @@ public class ItemInfo : ScriptableObject
     public new string name;
     public bool canBeStacked = true; //si se puede apilar
     public bool canBeDiscard =false; //si es de un solo uso
+    public Sprite icon; //el icono que se vera dentro del inventario
 }
