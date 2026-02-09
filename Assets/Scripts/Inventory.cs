@@ -10,7 +10,9 @@ public class Inventory : MonoBehaviour
     //aqui se guardan todos los objetos que tengamos y su cantidad (dictionary es el nombre propio)
     private Dictionary<string, uint> items = new Dictionary<string, uint>(); //la U es para que no salgan los numeros negativos 
 
-    public UnityEvent <ItemInfo> onAddItem;
+    //callback que se ejecuta cuando se añada un objeto
+    //pasa como parametro la indo de objeto añadido
+    public UnityAction <ItemInfo> onAddedItem;
 
 
     //crear una instancia publica para este script
@@ -58,7 +60,10 @@ public class Inventory : MonoBehaviour
                 items.Add(item.name, 1);
             }
 
-
         }
+        //ejecutar el callback de que se ha añadido un objeto, pasando su informacion
+        //el operador ? comprueba que haya algo en el callback para ejecutarlo
+        onAddedItem?.Invoke(item);
     }
+
 }
