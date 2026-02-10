@@ -5,10 +5,11 @@ using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
-    [SerializeField] private Image itemPrefab;
+    [SerializeField] private ItemUI itemPrefab;
     [SerializeField] private Transform itemLayout; //todos los objetos se emparentan aqui
+    private List<ItemUI> items = new List<ItemUI>();
 
-    public ItemInfo item;
+    //public ItemInfo item;
     void Start()
     {
         //el += es meterlo en la caja
@@ -16,15 +17,6 @@ public class InventoryUI : MonoBehaviour
         //importante que la funcion reciba un ItemIndo como parametro o llora muy fuerte
         Inventory.Instance.onAddedItem += CreateItem;
     }
-
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.I))
-    //    {
-    //        CreateItem(item);
-    //    }
-    //}
-
 
     public void CreateItem(ItemInfo itemInfo)
     {
@@ -42,8 +34,25 @@ public class InventoryUI : MonoBehaviour
             }
         }
         //crear una nueva imagen y emparentarla al Layout para que lo ponga en su posicion
-        Image newItem = Instantiate(itemPrefab, itemLayout);
-        //cambiar el sprite de la imagen al icono del objeto
-        newItem.sprite = itemInfo.icon;
+        ItemUI newItem = Instantiate(itemPrefab, slot);
+        //asignar al objeto de la UI su objeto al que hace referencia
+        newItem.SetItem(itemInfo);
+        //comprobar si el objeto ya esta en la lista de items o no
+        if (items.Contains(newItem) == false)
+        {
+            items.Add(newItem);
+        }
+        else
+        {
+            //buscar en todos los objetos que ya tenga almacenados
+            foreach (ItemUI item in items)
+            {
+                //cuando encuentre el objeto a actualiaar, modifica su texto 
+                if (item == newItem)
+                {
+                    item.UpdateAmount(0);
+                }
+            }
+        }
     }
 }
