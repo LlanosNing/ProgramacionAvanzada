@@ -11,8 +11,8 @@ public class Inventory : MonoBehaviour
     private Dictionary<string, uint> items = new Dictionary<string, uint>(); //la U es para que no salgan los numeros negativos 
 
     //callback que se ejecuta cuando se añada un objeto
-    //pasa como parametro la indo de objeto añadido
-    public UnityAction <ItemInfo> onAddedItem;
+    //pasa como parametro la indo de objeto añadido y que cantidad de ese objeto hay
+    public UnityAction <ItemInfo, uint> onAddedItem;
 
 
     //crear una instancia publica para este script
@@ -26,9 +26,9 @@ public class Inventory : MonoBehaviour
     void Start()
     {
         //estos son los parametros del scriptableObject
-        Debug.Log($"canBeStacked: {item.name}");
-        Debug.Log($"Nombre: {item.name}");
-        Debug.Log($"canBeDiscarded: {item.name}");
+        Debug.Log($"canBeStacked: {item.Name}");
+        Debug.Log($"Nombre: {item.Name}");
+        Debug.Log($"canBeDiscarded: {item.Name}");
     }
 
     private void Update()
@@ -42,9 +42,9 @@ public class Inventory : MonoBehaviour
     public void AddItem(ItemInfo item)
     {
         //Si el objeto no esta en el inventario, lo añade y ya
-        if (items.ContainsKey(item.name) == false)
+        if (items.ContainsKey(item.Name) == false)
         {
-            items.Add(item.name, 1);
+            items.Add(item.Name, 1);
         }
         //si el objeto ya esta en el inventario
         else
@@ -53,17 +53,17 @@ public class Inventory : MonoBehaviour
             {
                 //accedemos al valor a taves del nombre del objeto
                 //como el nombre es la key, se usa para acceder a cada objeto por separado
-                items[item.name] += 1;
+                items[item.Name] += 1;
             }
             else //si el objeto NO se puede stackear se añade de nuevo al diccionario
             {
-                items.Add(item.name, 1);
+                items.Add(item.Name, 1);
             }
 
         }
         //ejecutar el callback de que se ha añadido un objeto, pasando su informacion
         //el operador ? comprueba que haya algo en el callback para ejecutarlo
-        onAddedItem?.Invoke(item);
+        onAddedItem?.Invoke(item, items[item.Name]);
     }
 
 }

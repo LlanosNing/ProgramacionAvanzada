@@ -18,41 +18,55 @@ public class InventoryUI : MonoBehaviour
         Inventory.Instance.onAddedItem += CreateItem;
     }
 
-    public void CreateItem(ItemInfo itemInfo)
+    public void CreateItem(ItemInfo itemInfo, uint amount)
     {
-        Transform slot = null;
+        //buscar si el objeto ya esta en el inventario
+        ItemUI duplicateItem = FindItem(itemInfo);
+        //si hay un duplicado, se actualiza la cantidad del objeto
+        //si no hay duplicado, se crea un objeto nuevo
 
-        //buscar en todos los objetos hijos del layout (huecos)
-        for (int i = 0; i < itemLayout.childCount; i++)
+        if (duplicateItem == null)
         {
-            //si el huevo no tien eobjetos hijo, significa que esta vacío
-            if (itemLayout.GetChild(i).childCount == 0)
+            Transform slot = null;
+
+            //buscar en todos los objetos hijos del layout (huecos)
+            for (int i = 0; i < itemLayout.childCount; i++)
             {
-                //se asigna al hueco vacío y se sale del bucle
-                slot = itemLayout.GetChild(i);
-                break;
-            }
-        }
-        //crear una nueva imagen y emparentarla al Layout para que lo ponga en su posicion
-        ItemUI newItem = Instantiate(itemPrefab, slot);
-        //asignar al objeto de la UI su objeto al que hace referencia
-        newItem.SetItem(itemInfo);
-        //comprobar si el objeto ya esta en la lista de items o no
-        if (items.Contains(newItem) == false)
-        {
-            items.Add(newItem);
-        }
-        else
-        {
-            //buscar en todos los objetos que ya tenga almacenados
-            foreach (ItemUI item in items)
-            {
-                //cuando encuentre el objeto a actualiaar, modifica su texto 
-                if (item == newItem)
+                //si el huevo no tien eobjetos hijo, significa que esta vacío
+                if (itemLayout.GetChild(i).childCount == 0)
                 {
-                    item.UpdateAmount(0);
+                    //se asigna al hueco vacío y se sale del bucle
+                    slot = itemLayout.GetChild(i);
+                    break;
                 }
             }
+            //crear una nueva imagen y emparentarla al Layout para que lo ponga en su posicion
+            ItemUI newItem = Instantiate(itemPrefab, slot);
+            //asignar al objeto de la UI su objeto al que hace referencia
+            newItem.SetItem(itemInfo);
+            //añadir el objeto a la lista
+            items.Add(newItem);
         }
+        //si hay un duplicado, se actualiza la cantidad del objeto
+        else
+        {
+            duplicateItem.UpdateAmount(amount);
+        }
+    }
+
+    private ItemUI FindItem(ItemInfo infoToFind)
+    {
+        //buscamos en todos los objetos el que coincida con la info que buscamos
+        foreach (ItemUI item in items)
+        {
+            //si lo encuentra, lo devuelve
+            if (item.itemInfo == infoToFind)
+            {
+                return item;
+            }
+        }
+        //si no encuentra objeto que coincida, devuelve NULL
+        return null;
+
     }
 }

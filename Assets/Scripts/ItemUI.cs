@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 public class ItemUI : MonoBehaviour
 {
     //el objeto asociado a este objeto de la UI del inventario
-    [SerializeField] private ItemInfo itemInfo;
+    public ItemInfo itemInfo;
     [SerializeField] private Image icon;
     [SerializeField] private TMP_Text amountTxt;
 
@@ -25,7 +25,7 @@ public class ItemUI : MonoBehaviour
     }
 
     //actualizar el texto con la cantidad de objetos disponibles
-    public void UpdateAmount(int amount)
+    public void UpdateAmount(uint amount)
     {
         amountTxt.text = amount.ToString();
     }
