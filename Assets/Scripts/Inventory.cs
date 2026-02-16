@@ -13,7 +13,8 @@ public class Inventory : MonoBehaviour
     //callback que se ejecuta cuando se añada un objeto
     //pasa como parametro la indo de objeto añadido y que cantidad de ese objeto hay
     public UnityAction <ItemInfo, uint> onAddedItem;
-
+    //callback que se ejecuta cuando se elimine un objeto
+    public UnityAction<ItemInfo, uint> onRemovedItem;
 
     //crear una instancia publica para este script
     public static Inventory Instance;
@@ -25,10 +26,7 @@ public class Inventory : MonoBehaviour
 
     void Start()
     {
-        //estos son los parametros del scriptableObject
-        Debug.Log($"canBeStacked: {item.Name}");
-        Debug.Log($"Nombre: {item.Name}");
-        Debug.Log($"canBeDiscarded: {item.Name}");
+
     }
 
     private void Update()
@@ -66,4 +64,43 @@ public class Inventory : MonoBehaviour
         onAddedItem?.Invoke(item, items[item.Name]);
     }
 
+    public void RemoveItem(ItemInfo item)
+    {
+        if (items.ContainsKey(item.Name) == false)
+        {
+            return;
+        }
+
+        //para indicar si al final de la funcion hay que eliminar el objeto del diccionario
+        bool removeItem = false;
+        //si el objeto esta en el inventario, hay que quitarlo
+        // si el objeto se puede stackear, le resta 1 a la cantidad que tengamos
+        if (item.canBeStacked == true)
+        {
+            //accedemos al valor a taves del nombre del objeto
+            //como el nombre es la key, se usa para acceder a cada objeto por separado
+            items[item.Name] -= 1;
+            //en cuanto se gasta hay que comprobar si aun nos quedna objetos de ese tipo
+            //si no quedan, se eliminan del inventario
+            if (items[item.Name] <= 0)
+            {
+                removeItem = true;
+            }
+        }
+        else //si el objeto NO se puede stackear lo elimina del inventario
+        {
+            removeItem = true;
+
+            //forzar que la cantidad del objeto sea 0
+            items[item.Name] = 0;
+        }
+
+        //llamar al callback de que se ha eliminado un objeto
+        onRemovedItem?.Invoke(item, items[item.Name]);
+        //se comprueba si hay que eliminar el objeto del inventario o no
+        if(removeItem == true)
+        {
+            items.Remove(item.Name);
+        }
+    }
 }
