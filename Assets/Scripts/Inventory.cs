@@ -40,9 +40,9 @@ public class Inventory : MonoBehaviour
     public void AddItem(ItemInfo item)
     {
         //Si el objeto no esta en el inventario, lo añade y ya
-        if (items.ContainsKey(item.Name) == false)
+        if (items.ContainsKey(item.name) == false)
         {
-            items.Add(item.Name, 1);
+            items.Add(item.name, 1);
         }
         //si el objeto ya esta en el inventario
         else
@@ -51,22 +51,22 @@ public class Inventory : MonoBehaviour
             {
                 //accedemos al valor a taves del nombre del objeto
                 //como el nombre es la key, se usa para acceder a cada objeto por separado
-                items[item.Name] += 1;
+                items[item.name] += 1;
             }
             else //si el objeto NO se puede stackear se añade de nuevo al diccionario
             {
-                items.Add(item.Name, 1);
+                items.Add(item.name, 1);
             }
 
         }
         //ejecutar el callback de que se ha añadido un objeto, pasando su informacion
         //el operador ? comprueba que haya algo en el callback para ejecutarlo
-        onAddedItem?.Invoke(item, items[item.Name]);
+        onAddedItem?.Invoke(item, items[item.name]);
     }
 
     public void RemoveItem(ItemInfo item)
     {
-        if (items.ContainsKey(item.Name) == false)
+        if (items.ContainsKey(item.name) == false)
         {
             return;
         }
@@ -79,10 +79,10 @@ public class Inventory : MonoBehaviour
         {
             //accedemos al valor a taves del nombre del objeto
             //como el nombre es la key, se usa para acceder a cada objeto por separado
-            items[item.Name] -= 1;
+            items[item.name] -= 1;
             //en cuanto se gasta hay que comprobar si aun nos quedna objetos de ese tipo
             //si no quedan, se eliminan del inventario
-            if (items[item.Name] <= 0)
+            if (items[item.name] <= 0)
             {
                 removeItem = true;
             }
@@ -92,15 +92,15 @@ public class Inventory : MonoBehaviour
             removeItem = true;
 
             //forzar que la cantidad del objeto sea 0
-            items[item.Name] = 0;
+            items[item.name] = 0;
         }
 
         //llamar al callback de que se ha eliminado un objeto
-        onRemovedItem?.Invoke(item, items[item.Name]);
+        onRemovedItem?.Invoke(item, items[item.name]);
         //se comprueba si hay que eliminar el objeto del inventario o no
         if(removeItem == true)
         {
-            items.Remove(item.Name);
+            items.Remove(item.name);
         }
     }
 }
