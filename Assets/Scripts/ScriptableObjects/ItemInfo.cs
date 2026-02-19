@@ -12,11 +12,12 @@ public class ItemInfo : ScriptableObject
     public ItemType type; //tipo de objeto que es
 
     //para que todos los objetos tengan una funcion por defceto de usar
-    public void Use()
+    //usamos la palabra clave VIRTUAL para que se pueda sobreescribir esta funcion
+    public virtual void Use()
     {
         if (type == ItemType.Consumible) 
         {
-             Inventory.Instance.RemoveItem(this);
+            Debug.Log($"Used standard item: {name}");
         }
     }
 }

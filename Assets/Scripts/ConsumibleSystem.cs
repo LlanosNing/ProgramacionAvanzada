@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class ConsumibleSystem : MonoBehaviour
+public class ConsumibleSystem : ItemInfo
 {
     //todos los consumibles que queramos llevar equipados
     [SerializeField] private List<ConsumibleSlot> slots;
 
+    //callback para que cada vez que se use un consumible
+    public static UnityAction <ItemInfo> onConsumibleUsed;
     private void Update()
     {
         //comprobar si se ha pulsado la tecla de alguno de los slots
@@ -16,6 +19,7 @@ public class ConsumibleSystem : MonoBehaviour
             {
                 //se usa lo que haya asignado a ese slot
                 slots[i].Use();
+                onConsumibleUsed?.Invoke(slots[i].consumible);
             }
         }   
     }
