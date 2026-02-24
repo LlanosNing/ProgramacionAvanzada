@@ -31,6 +31,9 @@ public class FirstPersonController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         //Buscamos la camara entre los objetos hijo y la asignamos
         cam = GetComponentInChildren<Camera>();
+
+        //añadir la funcion del consumible al callback de consumible utilizado
+        ConsumibleSystem.onConsumibleUsed += ConsumibleUsed;
     }
 
     void Update()
@@ -91,6 +94,30 @@ public class FirstPersonController : MonoBehaviour
         {
             isGrounded = false;
         }
+    }
+
+    //MODIFICACION PARA USAR LOS CONSUMIBLES
+    void ConsumibleUsed(ItemInfo consumible)
+    {
+        //hay que transformar el ItemIn
+        Consumible cons = consumible as Consumible;
+        //solo cambia la velocidad de movimiento si es un buff de este tipo
+        if (cons.moveSpeedAmount != 0)
+        {
+            //llamar a la corrutina que cambia la velocidad de movimiento con los valores del consumible
+            StartCoroutine(MoveSpeedChangeCrt(cons.moveSpeedAmount, cons.duration));
+        }
+    }
+
+    IEnumerator MoveSpeedChangeCrt(float moveSpeedChange, float duration)
+    {
+        //modificar la velocidad
+        moveSpeed += moveSpeedChange;
+        //esperar la duracion del consumible
+        yield return new WaitForSeconds(duration);
+        //restaurar la velocidad
+        moveSpeed -= moveSpeedChange;
+
     }
 
     private void OnDrawGizmos()

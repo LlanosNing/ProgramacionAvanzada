@@ -103,4 +103,10 @@ public class Inventory : MonoBehaviour
             items.Remove(item.name);
         }
     }
+
+    //devuelve true o false en funcion de si se tiene el objeto especificado o no
+    public bool HasItem(ItemInfo itemToFind)
+    {
+       return items.ContainsKey(itemToFind.name);
+    }
 }

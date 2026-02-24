@@ -297,4 +297,11 @@ public class SimpleThirdPersonController : MonoBehaviour
             Gizmos.DrawRay(transform.position + Vector3.up * 0.5f, rightLimit);
         }
     }
+
+    //MODIFICACION PARA USAR LOS CONSUMIBLES
+    void ConsumibleUsed(ItemInfo consumible)
+    {
+
+    }
+
 }

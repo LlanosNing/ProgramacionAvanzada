@@ -15,7 +15,7 @@ public class ConsumibleSystem : ItemInfo
         //comprobar si se ha pulsado la tecla de alguno de los slots
         for (int i = 0; i < slots.Count; i++)
         {
-            if (Input.GetKeyDown(slots[i].key))
+            if (Input.GetKeyDown(slots[i].key) && Inventory.Instance.HasItem(slots[i].consumible))
             {
                 //se usa lo que haya asignado a ese slot
                 slots[i].Use();
