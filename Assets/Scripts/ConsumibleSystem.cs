@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class ConsumibleSystem : ItemInfo
+public class ConsumibleSystem : MonoBehaviour
 {
     //todos los consumibles que queramos llevar equipados
     [SerializeField] private List<ConsumibleSlot> slots;

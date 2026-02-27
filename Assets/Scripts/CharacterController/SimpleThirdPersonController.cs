@@ -1,5 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
 /// <summary>
 /// Controlador de personaje en tercera persona sin animaciones
 /// Perfecto para prototipos con solo una cápsula
@@ -65,6 +66,9 @@ public class SimpleThirdPersonController : MonoBehaviour
         Cursor.visible = false;
 
         forwardRotation = transform.rotation;
+
+        //añadir la funcion del consumible al callback de consumible utilizado
+        ConsumibleSystem.onConsumibleUsed += ConsumibleUsed;
     }
 
     void Update()
@@ -301,6 +305,24 @@ public class SimpleThirdPersonController : MonoBehaviour
     //MODIFICACION PARA USAR LOS CONSUMIBLES
     void ConsumibleUsed(ItemInfo consumible)
     {
+        //hay que transformar el ItemIn
+        Consumible cons = consumible as Consumible;
+        //solo cambia la velocidad de movimiento si es un buff de este tipo
+        if (cons.moveSpeedAmount != 0)
+        {
+            //llamar a la corrutina que cambia la velocidad de movimiento con los valores del consumible
+            StartCoroutine(MoveSpeedChangeCrt(cons.moveSpeedAmount, cons.duration));
+        }
+    }
+
+    IEnumerator MoveSpeedChangeCrt(float moveSpeedChange, float duration)
+    {
+        //modificar la velocidad
+        walkSpeed += moveSpeedChange;
+        //esperar la duracion del consumible
+        yield return new WaitForSeconds(duration);
+        //restaurar la velocidad
+        walkSpeed -= moveSpeedChange;
 
     }
 
