@@ -35,7 +35,6 @@ public class FirstPersonController : MonoBehaviour
         //añadir la funcion del consumible al callback de consumible utilizado
         ConsumibleSystem.onConsumibleUsed += ConsumibleUsed;
     }
-
     void Update()
     {
         float _horizontal = Input.GetAxisRaw("Horizontal");

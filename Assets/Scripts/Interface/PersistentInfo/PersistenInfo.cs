@@ -1,0 +1,49 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PersistenInfo : MonoBehaviour
+{
+    public static PersistenInfo singleton;
+
+    //listas con las ID de todos los cofres abiertos
+    [SerializeField] private List<uint> openChests = new List<uint>(); //el uint es como un int pero no admite valores negativos
+
+    //para las instancias se usa el awake en vez del start
+    private void Awake()
+    {
+        //cuando no hay nadie como singleton, se asigna y se marca para que no se destruya
+        if(singleton == null)
+        {
+            singleton = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        //si al iniciar ya hay un singleton, este objeto debe destruirse para que no haya duplicados
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        }
+    }
+
+    public void AddOpenChest(uint chestID)
+    {
+        //si la ID no esta en la lista, la añade
+        if(openChests.Contains(chestID) == false)
+            openChests.Add(chestID);
+    }
+
+    public bool IsChestOpened(uint chestID)
+    {
+        //devuelve true o false en funcion de si el cofre esta en la lista de abiertos
+        return openChests.Contains(chestID);
+    }
+
+}
