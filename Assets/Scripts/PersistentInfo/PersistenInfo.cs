@@ -37,7 +37,11 @@ public class PersistenInfo : MonoBehaviour
     {
         //si la ID no esta en la lista, la añade
         if(openChests.Contains(chestID) == false)
+        {
             openChests.Add(chestID);
+            //guardar los cofres
+            SaveManager.Save(openChests);
+        }
     }
 
     public bool IsChestOpened(uint chestID)
