@@ -25,6 +25,21 @@ public class PersistenInfo : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        //añadir una funcion al callback de datos cargados
+        //este codigo tan feo D: es una funcion anonima. Es como una funcion normal
+        //pero se crea en el momento para añadirla al callbacl
+        //entre los parentesis hay que añadir un SaveData porque el callbacl lo usa como parametro
+        SaveManager.OnLoadedData += (SaveData saveData) =>
+        {
+            //actualiza la lista de cofres con la que haa cargado
+            openChests = new List<uint>(saveData.openChestsIDs);
+        };
+        //llamar a la funcion de cargar datos
+        SaveManager.Load();     
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.F6))
