@@ -17,6 +17,16 @@ public class PersistenInfo : MonoBehaviour
         {
             singleton = this;
             DontDestroyOnLoad(gameObject);
+
+            //añadir una funcion al callback de datos cargados
+            //este codigo tan feo D: es una funcion anonima. Es como una funcion normal
+            //pero se crea en el momento para añadirla al callbacl
+            //entre los parentesis hay que añadir un SaveData porque el callbacl lo usa como parametro
+            SaveManager.OnLoadedData += (SaveData saveData) =>
+            {
+                //actualiza la lista de cofres con la que haa cargado
+                openChests = new List<uint>(saveData.openChestsIDs);
+            };
         }
         //si al iniciar ya hay un singleton, este objeto debe destruirse para que no haya duplicados
         else
@@ -27,25 +37,8 @@ public class PersistenInfo : MonoBehaviour
 
     private void Start()
     {
-        //añadir una funcion al callback de datos cargados
-        //este codigo tan feo D: es una funcion anonima. Es como una funcion normal
-        //pero se crea en el momento para añadirla al callbacl
-        //entre los parentesis hay que añadir un SaveData porque el callbacl lo usa como parametro
-        SaveManager.OnLoadedData += (SaveData saveData) =>
-        {
-            //actualiza la lista de cofres con la que haa cargado
-            openChests = new List<uint>(saveData.openChestsIDs);
-        };
-        //llamar a la funcion de cargar datos
-        SaveManager.Load();     
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.F6))
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
-        }
+        //añadir la funcion de guardar al callback de guardar datos
+        SaveManager.OnSaveData += Save;
     }
 
     public void AddOpenChest(uint chestID)
@@ -55,8 +48,15 @@ public class PersistenInfo : MonoBehaviour
         {
             openChests.Add(chestID);
             //guardar los cofres
-            SaveManager.Save(openChests);
+            SaveManager.Save();
         }
+    }
+
+    //se añade al callback de guardar info
+    void Save(SaveData saveData)
+    {
+        //actualizar los datos de guardado con la lista de cofres abiertos
+        saveData.openChestsIDs = new List<uint>(openChests);
     }
 
     public bool IsChestOpened(uint chestID)
