@@ -11,8 +11,9 @@ public class PlayerShoot : MonoBehaviour
     //el prefab que utilizara para crear los objetos del pool
     [SerializeField] private Bolt boltPrefab;
     [SerializeField] private Transform shootOrigin;
+    [SerializeField] private float shootForce = 6;
     //el pool de proyectiles (el pool es como un cajon)
-    private ObjectPool<Bolt> boltPool;
+    public ObjectPool<Bolt> boltPool;
 
     private void Start()
     {
@@ -43,18 +44,21 @@ public class PlayerShoot : MonoBehaviour
         //movel el proyectil al punto de origen de disparo
         bolt.transform.position = shootOrigin.position;
         //añadir fuerza al proyectil
+        bolt.Shoot(shootOrigin.forward * shootForce);
     }
 
     //se llama cada vez que un proyectil vuelva al pool
     private void ReleaseBolt(Bolt bolt)
     {
+        //reiniciar sus valores de velocidad
+        bolt.ResetVelocity();
         //desactivar el objeto al devolverlo al pool    
         bolt.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (Input.GetMouseButton(1)){
+        if (Input.GetMouseButtonDown(1)){
 
             //coger un proyectil de los que haya en el pool
             boltPool.Get();
