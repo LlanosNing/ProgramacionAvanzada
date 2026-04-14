@@ -4,7 +4,7 @@ using UnityEngine;
 
 //el IInteractuable (las interfaces) de primeras chilla porque pide que se implemente la interfaz
 //si pasas el cursor por encima del error debe de aparecer algo de Fix error y la primera opcion debe de ser algo de implementar inferfaz
-public class FriendlyNPC : MonoBehaviour, IInteractuable
+public class FriendlyNPC : MonoBehaviour, IInteractable
 {
     [SerializeField] private Dialogue dialogue;
 
@@ -14,12 +14,12 @@ public class FriendlyNPC : MonoBehaviour, IInteractuable
         DialogueManager.singleton.BeginDialogue(dialogue);
     }
 
-    //DEBUGGING: se cambiara por interactuar con el NPC
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Interact();
-        }
-    }
+    ////DEBUGGING: se cambiara por interactuar con el NPC
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.CompareTag("Player"))
+    //    {
+    //        Interact();
+    //    }
+    //}
 }
