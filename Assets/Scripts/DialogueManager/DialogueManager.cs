@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -27,6 +28,12 @@ public class DialogueManager : MonoBehaviour
     private Canvas canvas; //el componente canvas que lleva el manager
     private bool inDialogue = false; //pa veh si hay un dialogo en curso
 
+    //callback para cuando se inicia un dialogo
+    public UnityAction<Dialogue> onDialogueStart;
+    //callback para cuando finaliza un dialogo
+    public UnityAction<Dialogue> onDialogueEnd;
+
+
     private void Start()
     {
         canvas = GetComponent<Canvas>();
@@ -46,6 +53,8 @@ public class DialogueManager : MonoBehaviour
         inDialogue = true;
         //mostrar la primera linea de dialogo
         ShowDialogueLine();
+        //llamar al callback del dialogo iniciado
+        onDialogueStart?.Invoke(dialogue);
     }
 
     void ShowDialogueLine()
@@ -60,8 +69,8 @@ public class DialogueManager : MonoBehaviour
     public void NextLine()
     {
         //si ha llegado a la ultima linea de dialogo, se cierra
-        if (currentLine >= currentDialogue.lines.Count) 
-        {
+        if (currentLine >= currentDialogue.lines.Count - 1) 
+        {   
             EndDialogue();
             return;
         }
@@ -75,6 +84,8 @@ public class DialogueManager : MonoBehaviour
         canvas.enabled = false;
         //marcar que ya no hay ningun dialogo en curso
         inDialogue = false;
+        //llamar al ballback de dialogo terminado
+        onDialogueEnd?.Invoke(currentDialogue);
     }
 
     private void Update()
@@ -83,5 +94,12 @@ public class DialogueManager : MonoBehaviour
         {
             NextLine();
         }
+    }
+
+    private void OnLevelWasLoaded(int level)
+    {
+        //eliminar todo lo que haya guardado en los callbacks cada vez que cambie de escen
+        onDialogueEnd = null;
+        onDialogueStart = null;
     }
 }

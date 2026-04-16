@@ -25,6 +25,9 @@ public class FirstPersonController : MonoBehaviour
     private Rigidbody rb;
     private Camera cam;
 
+    //para bloquear o activar el control
+    private bool canControl = true;
+
     void Start()
     {
         //Para buscar y asignar el Rigidbody automaticamente
@@ -34,9 +37,32 @@ public class FirstPersonController : MonoBehaviour
 
         //añadir la funcion del consumible al callback de consumible utilizado
         ConsumibleSystem.onConsumibleUsed += ConsumibleUsed;
+
+        //añadir las funciones locales a los callbacks del DialogueManager
+        DialogueManager.singleton.onDialogueStart += DisableControl;
+        DialogueManager.singleton.onDialogueEnd += EnableControl;
+
+        //ehto eh una funcion local. Basicamente solo existe en el start. Ehto eh para cambiar el control
+        void EnableControl(Dialogue d)
+        {
+            canControl = true;
+        }
+
+        void DisableControl(Dialogue d)
+        {
+            canControl = false;
+        }
     }
     void Update()
     {
+        //bloquear el control
+        if(canControl == false)//input es una variable del script
+        {
+            input = Vector3.zero;
+            return;
+        }
+
+
         float _horizontal = Input.GetAxisRaw("Horizontal");
         float _vertical = Input.GetAxisRaw("Vertical");
         //Guardamos el input para usarlo en FixedUpdate

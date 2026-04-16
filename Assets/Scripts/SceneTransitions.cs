@@ -25,6 +25,8 @@ public class SceneTransitions : MonoBehaviour
         //activar la imageny hacer un tween para aumentar su alfa a 1
         fadeImage.gameObject.SetActive(true);
         fadeImage.LeanAlpha(1f, .5f);
+        //esperar un tiempo antes de ejecutar el Fade Out
+        LeanTween.delayedCall(2f, FadeOut);
     }
      public void FadeOut()
     {
