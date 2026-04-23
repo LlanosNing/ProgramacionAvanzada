@@ -12,9 +12,8 @@ public class SaveData
 {
     //Lista de cofres ya abiertos
     public List<uint> openChestsIDs;
+    internal List<ItemSaveData> items;
 }
-
-
 
 public class SaveManager
 {

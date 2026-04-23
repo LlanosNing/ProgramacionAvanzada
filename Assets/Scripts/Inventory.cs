@@ -23,19 +23,18 @@ public class Inventory : MonoBehaviour
     {
         Instance = this;
     }
-
     void Start()
     {
-
+        SaveManager.OnSaveData += SaveItems;
     }
 
-    private void Update()
-    {
-        foreach (var item in items)
-        {
-            Debug.Log($"{item.Key} Quantity: {item.Value}"); //esto es porque Unity no deja ver lo que hay en el inventario (en el editor)
-        }
-    }
+    //private void Update()
+    //{
+    //    foreach (var item in items)
+    //    {
+    //        Debug.Log($"{item.Key} Quantity: {item.Value}"); //esto es porque Unity no deja ver lo que hay en el inventario (en el editor)
+    //    }
+    //}
 
     public void AddItem(ItemInfo item)
     {
@@ -108,5 +107,46 @@ public class Inventory : MonoBehaviour
     public bool HasItem(ItemInfo itemToFind)
     {
        return items.ContainsKey(itemToFind.name);
+    }
+
+    void SaveItems(SaveData saveData)
+    {
+        //Crear lista de objetos a guardar
+        List<ItemSaveData> itemsToSave = new List<ItemSaveData>();
+        //Por cada objeto que haya en el inventario, se crea un objeto de info
+        foreach (var item in items)
+        {
+            ItemSaveData itemData = new ItemSaveData(item.Key, item.Value);
+            itemsToSave.Add(itemData);
+        }
+        //Hay que guardar la lista creada en los datos de guardado
+        //La guardamos como una copia, no se iguala directamente
+        saveData.items = new List<ItemSaveData>(itemsToSave);
+    }
+
+    void LoadItems(SaveData loadedData)
+    {
+        //Por cada objeto guardado en la lista, creamos y añadimos uno nuevo al diccionario
+        foreach (var item in loadedData.items)
+        {
+            items.Add(item.name, item.amount);
+            Debug.Log($"Added {item.name}");
+            //buscar el scriptableObject con este nombre
+            ItemInfo itemInfo = ItemDatabase.FindItem(item.name);
+            Debug.Log($"Found item: {itemInfo}");
+            //llamar al callback de objeto añadido con el objeto cargado
+            onAddedItem?.Invoke(itemInfo, item.amount);
+        }
+    }
+}
+
+//esto fran no lo tenia en el codigo pero sin esto se rallaba el codigo por algo que no entiendo :C
+internal class ItemSaveData
+{
+    internal string name;
+    internal uint amount;
+
+    public ItemSaveData(string key, uint value)
+    {
     }
 }
