@@ -10,12 +10,17 @@ public class InventoryUI : MonoBehaviour
     private List<ItemUI> items = new List<ItemUI>();
 
     //public ItemInfo item;
-    void Start()
+    //hay que añadirlo en el awake para que de tiempo a añadirse al callback de items cargados
+    private void Awake()
     {
         //el += es meterlo en la caja
         //añadir la funcion CreateItem al callbacl del inventario cuando se añade un objeto
         //importante que la funcion reciba un ItemIndo como parametro o llora muy fuerte
         Inventory.Instance.onAddedItem += CreateItem;
+    }
+    void Start()
+    {
+       
         //añadir la funcion DeleteItem al callback del inventario cuando se usa un objeto
         Inventory.Instance.onRemovedItem += DeleteItem;
     }
@@ -115,7 +120,7 @@ public class InventoryUI : MonoBehaviour
         {
             //tween para ocultar y cambiar la escala a 0
             itemLayout.LeanScale(Vector3.zero, .5f).setEaseInBack().setOnComplete(()=> itemLayout.gameObject.SetActive(false));
-            //itemLayout.gameObject.SetActive(false);
+            //  itemLayout.gameObject.SetActive(false);
         }
     }
 

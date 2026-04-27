@@ -19,6 +19,7 @@ public class Inventory : MonoBehaviour
     //crear una instancia publica para este script
     public static Inventory Instance;
 
+    //pa que de tiempo a suscribirse a los eventos de cargar del inventory
     public void Awake()
     {
         Instance = this;
