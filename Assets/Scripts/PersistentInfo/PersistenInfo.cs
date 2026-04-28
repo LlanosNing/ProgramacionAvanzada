@@ -8,6 +8,8 @@ public class PersistenInfo : MonoBehaviour
 
     //listas con las ID de todos los cofres abiertos
     [SerializeField] private List<uint> openChests = new List<uint>(); //el uint es como un int pero no admite valores negativos
+    //guarda la ID del punto en el que haya que spawnear en ese momento
+    public string currentSpawnPointID;
 
     //para las instancias se usa el awake en vez del start
     private void Awake()
@@ -18,10 +20,10 @@ public class PersistenInfo : MonoBehaviour
             singleton = this;
             DontDestroyOnLoad(gameObject);
 
-            //añadir una funcion al callback de datos cargados
-            //este codigo tan feo D: es una funcion anonima. Es como una funcion normal
-            //pero se crea en el momento para añadirla al callbacl
-            //entre los parentesis hay que añadir un SaveData porque el callbacl lo usa como parametro
+            //añadir una función al callback de datos cargados
+            //este código tan feo D: es una función anónima. Es como una función normal
+            //pero se crea en el momento para añadirla al callbacl¡k
+            //entre los paréntesis hay que añadir un SaveData porque el callback lo usa como parámetro
             SaveManager.OnLoadedData += (SaveData saveData) =>
             {
                 //actualiza la lista de cofres con la que haa cargado
@@ -37,7 +39,7 @@ public class PersistenInfo : MonoBehaviour
 
     private void Start()
     {
-        //añadir la funcion de guardar al callback de guardar datos
+        //añadir la función de guardar al callback de guardar datos
         SaveManager.OnSaveData += Save;
     }
 
@@ -61,7 +63,7 @@ public class PersistenInfo : MonoBehaviour
 
     public bool IsChestOpened(uint chestID)
     {
-        //devuelve true o false en funcion de si el cofre esta en la lista de abiertos
+        //devuelve true o false en función de si el cofre esta en la lista de abiertos
         return openChests.Contains(chestID);
     }
 
