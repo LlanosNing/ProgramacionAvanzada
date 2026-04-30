@@ -820,7 +820,7 @@ MonoBehaviour:
   spawnPoints:
   - id: SpawnPoint_door1
     point: {fileID: 519669234}
-  spawnID: SpawnPoint_door1
+  spawnID: 
 --- !u!4 &343605833
 Transform:
   m_ObjectHideFlags: 0

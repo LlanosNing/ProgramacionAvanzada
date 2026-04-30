@@ -12,9 +12,37 @@ public class SaveData
 {
     //Lista de cofres ya abiertos
     public List<uint> openChestsIDs;
+    //inventario: lista de informacion de los objetos que tengamos
     internal List<ItemSaveData> items;
+    //escena y posicion en la que estaba al momento de cerrar el juego
+    public SceneInfo sceneInfo;
 }
 
+internal class ItemSaveData
+{
+    internal string name;
+    internal uint amount;
+
+    //metodo constructor
+    public ItemSaveData(string _name, uint _amount)
+    {
+        name = _name;
+        amount = _amount;
+    }
+}
+
+[System.Serializable]
+public struct SceneInfo
+{
+    public string name;
+    public Vector3 lastPosition;
+
+    public SceneInfo(string _name, Vector3 _lastPosition)
+    {
+        name= _name;
+        lastPosition = _lastPosition;
+    }
+}
 public class SaveManager
 {
     static string fileName = "ReadMe.kebab";

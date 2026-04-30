@@ -141,13 +141,3 @@ public class Inventory : MonoBehaviour
     }
 }
 
-//esto fran no lo tenia en el codigo pero sin esto se rallaba el codigo por algo que no entiendo :C
-internal class ItemSaveData
-{
-    internal string name;
-    internal uint amount;
-
-    public ItemSaveData(string key, uint value)
-    {
-    }
-}
